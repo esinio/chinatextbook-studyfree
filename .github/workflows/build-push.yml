@@ -15,22 +15,26 @@ jobs:
   build-and-push:
     runs-on: ubuntu-latest
     steps:
-      # 1. 检出你自己的仓库（仅用于获取 workflow 文件，实际源码在下一步克隆）
+      # 1. 检出你的仓库
       - name: Checkout workflow repo
         uses: actions/checkout@v4
 
-      # 2. 释放磁盘空间（原项目构建需下载约 2GB 资源并转码，空间紧张）
+      # 2. 深度清理磁盘空间 (替换为你原来的简单 rm 命令)
       - name: Free Disk Space (Ubuntu)
-        run: |
-          sudo rm -rf /usr/share/dotnet /opt/ghc /usr/local/share/boost "$AGENT_TOOLSDIRECTORY"
-          df -h /
+        uses: jlumbroso/free-disk-space@main
+        with:
+          tool-cache: false # 保留工具缓存，以免后续步骤变慢
+          android: true     # 删除 Android SDK (~8GB)
+          dotnet: true      # 删除 .NET (~2GB)
+          haskell: true     # 删除 Haskell (~5GB)
+          large-packages: true # 删除大型非必要包
+          swap-storage: true   # 删除 swap 存储 (~4GB)，构建大项目必备
 
-      # 3. 克隆远程的实际程序代码仓库
+      # 3. 克隆实际程序代码仓库
       - name: Clone source repository
         run: |
           git clone --branch main https://github.com/wuwangzhang1216/ChinaTextbookStudyFree.git source-code
           cd source-code
-          # 验证 Dockerfile 存在，确保后续构建不会空跑
           ls -la Dockerfile compose.yaml
 
       # 4. 设置 Docker Buildx
@@ -54,7 +58,7 @@ jobs:
             type=raw,value=latest
             type=raw,value=${{ env.ASSETS_RELEASE }}
 
-      # 7. 构建并推送（注意 context 指向克隆下来的 source-code 目录）
+      # 7. 构建并推送 Docker 镜像
       - name: Build and push Docker image
         uses: docker/build-push-action@v5
         with:
@@ -64,6 +68,7 @@ jobs:
           labels: ${{ steps.meta.outputs.labels }}
           build-args: |
             ASSETS_RELEASE=${{ env.ASSETS_RELEASE }}
-          # 启用 GitHub Actions 缓存，避免每次重新下载 2GB 资源
+          # 注意：将 mode=max 改为 mode=min 或者直接删掉 cache-to
+          # mode=min 只缓存最终的镜像层，不会爆掉磁盘
           cache-from: type=gha
-          cache-to: type=gha,mode=max
+          # cache-to: type=gha,mode=min
