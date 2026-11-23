@@ -70,5 +70,5 @@ jobs:
             ASSETS_RELEASE=${{ env.ASSETS_RELEASE }}
           # 注意：将 mode=max 改为 mode=min 或者直接删掉 cache-to
           # mode=min 只缓存最终的镜像层，不会爆掉磁盘
-          cache-from: type=gha
+          # cache-from: type=gha
           # cache-to: type=gha,mode=min
