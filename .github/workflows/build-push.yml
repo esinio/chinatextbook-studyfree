@@ -23,7 +23,8 @@ jobs:
       - name: Free Disk Space (Ubuntu)
         uses: jlumbroso/free-disk-space@main
         with:
-          tool-cache: true # 保留工具缓存，以免后续步骤变慢 # 必须设置 tool-cache 为 true，才能释放出 20GB+ 空间
+          # tool-cache: true # 保留工具缓存，以免后续步骤变慢 # 必须设置 tool-cache 为 true，才能释放出 20GB+ 空间
+          preinstalled-runtimes: true # instead of tool-cache(v1 v2 available) from v3
           android: true     # 删除 Android SDK (~8GB)
           dotnet: true      # 删除 .NET (~2GB)
           haskell: true     # 删除 Haskell (~5GB)
