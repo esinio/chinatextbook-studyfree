@@ -59,6 +59,12 @@ jobs:
             type=raw,value=latest
             type=raw,value=${{ env.ASSETS_RELEASE }}
 
+      # 清理 Docker 缓存, 释放之前构建任务留下的垃圾
+      - name: Clean up Docker space
+        run: |
+          docker system prune -af
+          docker builder prune -af
+    
       # 7. 构建并推送 Docker 镜像
       - name: Build and push Docker image
         uses: docker/build-push-action@v6
