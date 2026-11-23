@@ -23,7 +23,7 @@ jobs:
       - name: Free Disk Space (Ubuntu)
         uses: jlumbroso/free-disk-space@main
         with:
-          tool-cache: false # 保留工具缓存，以免后续步骤变慢
+          tool-cache: true # 保留工具缓存，以免后续步骤变慢 # 必须设置 tool-cache 为 true，才能释放出 20GB+ 空间
           android: true     # 删除 Android SDK (~8GB)
           dotnet: true      # 删除 .NET (~2GB)
           haskell: true     # 删除 Haskell (~5GB)
@@ -60,7 +60,7 @@ jobs:
 
       # 7. 构建并推送 Docker 镜像
       - name: Build and push Docker image
-        uses: docker/build-push-action@v5
+        uses: docker/build-push-action@v6
         with:
           context: ./source-code
           push: true
